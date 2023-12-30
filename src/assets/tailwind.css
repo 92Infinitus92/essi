@@ -29,3 +29,7 @@ nav {
 .essi-logo {
   font-family: "Orbitron", sans-serif;
 }
+
+.router-link-active {
+  @apply underline;
+}

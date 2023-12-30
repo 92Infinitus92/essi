@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-52">
+  <div class="">
     <h1>Earth Image</h1>
     <!-- The Earth Image content will be rendered here -->
   </div>

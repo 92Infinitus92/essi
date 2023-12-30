@@ -41,7 +41,7 @@
       <!-- Theme Switcher and Sign In Button -->
       <div class="flex items-center justify-between md:w-1/5 w-60">
         <!-- Theme Switcher -->
-        <div class="order-2 md:order-1 relative">
+        <div class="order-1 md:order-1 relative">
           <input
             type="checkbox"
             id="theme-switcher"
@@ -63,11 +63,33 @@
           </label>
         </div>
 
-        <!-- Sign In Button -->
+        <!-- User Profile Display -->
+        <div v-if="isAuthenticated" class="flex items-center space-x-4">
+          <img
+            :src="user?.picture"
+            alt="Profile picture"
+            class="rounded-full w-12 h-12"
+          />
+          <div class="text-white text-sm">
+            <p class="font-bold">{{ user?.name }}</p>
+            <p>{{ user?.email }}</p>
+          </div>
+        </div>
+
+        <!-- Sign In/Sign Out Button -->
         <button
-          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded order-2"
+          v-if="!isAuthenticated"
+          @click="login"
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           Sign In
+        </button>
+        <button
+          v-else
+          @click="logout"
+          class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Sign Out
         </button>
 
         <!-- Mobile Menu Button -->
@@ -76,29 +98,6 @@
           <i class="fas fa-times" v-else></i>
         </button>
       </div>
-
-      <!-- Mobile Menu -->
-      <!-- <div
-      v-if="isMobileMenuOpen"
-      class="absolute top-32 left-0 w-full bg-gray-800 md:hidden"
-    >
-      <router-link to="/" class="block text-center p-2 hover:bg-gray-700"
-        >Home</router-link
-      >
-      <router-link to="/apod" class="block text-center p-2 hover:bg-gray-700"
-        >APOD</router-link
-      >
-      <router-link
-        to="/earth-image"
-        class="block text-center p-2 hover:bg-gray-700"
-        >Earth Image</router-link
-      >
-      <router-link
-        to="/epic-image"
-        class="block text-center p-2 hover:bg-gray-700"
-        >EPIC Image</router-link
-      >
-    </div> -->
     </nav>
     <!-- Router View: Components for the current route will be rendered here -->
     <router-view></router-view>
@@ -107,10 +106,12 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch, onMounted } from "vue";
+import { useAuth0 } from "@auth0/auth0-vue";
 
 export default defineComponent({
   name: "App",
   setup() {
+    const { loginWithRedirect, logout, user, isAuthenticated } = useAuth0();
     const isDarkTheme = ref(false);
 
     // Apply theme changes
@@ -150,6 +151,14 @@ export default defineComponent({
       toggleDarkTheme,
       isMobileMenuOpen,
       toggleMobileMenu,
+      isAuthenticated,
+      user,
+      login: () => {
+        loginWithRedirect();
+      },
+      logout: () => {
+        logout({ logoutParams: { returnTo: window.location.origin } });
+      },
     };
   },
 });
