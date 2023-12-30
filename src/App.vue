@@ -1,11 +1,16 @@
 <template>
-  <nav class="flex items-center justify-between p-4 bg-gray-800 text-white">
+  <nav
+    class="flex items-center justify-between px-12 bg-gray-800 text-white pb-2"
+  >
     <!-- Logo -->
-    <img
-      src="https://i.ibb.co/M1knWxw/ESSI.webp"
-      alt="ESSI Logo"
-      class="h-12"
-    />
+    <div class="flex flex-col">
+      <img
+        src="https://i.ibb.co/M1knWxw/ESSI.webp"
+        alt="ESSI Logo"
+        class="h-24"
+      />
+      <h1 class="essi-logo text-xl font-semibold text-center -mt-5">ESSI</h1>
+    </div>
 
     <!-- Navigation Links -->
     <div class="hidden md:flex space-x-4">
@@ -30,13 +35,13 @@
       />
       <label
         for="theme-switcher"
-        class="bg-gray-600 rounded-full p-1 w-20 h-7 flex items-center justify-between cursor-pointer"
+        class="bg-gray-600 rounded-full p-1 w-20 h-7 flex items-center justify-between cursor-pointer px-3"
       >
         <i class="fas fa-sun text-yellow-500"></i>
         <span
           class="bg-white rounded-full block w-5 h-5 absolute transform transition-transform"
           :class="{ 'translate-x-12': isDarkTheme }"
-          :style="{ left: isDarkTheme ? '0.6rem' : '0.25rem' }"
+          :style="{ left: isDarkTheme ? '0.5rem' : '0.55rem' }"
         ></span>
         <i class="fas fa-moon text-indigo-300"></i>
       </label>
