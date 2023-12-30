@@ -18,22 +18,22 @@
       >
         <router-link
           to="/"
-          class="block px-2 py-2 hover:text-gray-300 text-center"
+          class="block px-2 py-2 hover:text-gray-300 text-center text-2xl"
           >Home</router-link
         >
         <router-link
           to="/apod"
-          class="block px-2 py-2 hover:text-gray-300 text-center"
+          class="block px-2 py-2 hover:text-gray-300 text-center text-2xl"
           >APOD</router-link
         >
         <router-link
           to="/earth-image"
-          class="block px-2 py-2 hover:text-gray-300 text-center"
+          class="block px-2 py-2 hover:text-gray-300 text-center text-2xl"
           >Earth Image</router-link
         >
         <router-link
           to="/epic-image"
-          class="block px-2 py-2 hover:text-gray-300 text-center"
+          class="block px-2 py-2 hover:text-gray-300 text-center text-2xl"
           >EPIC Image</router-link
         >
       </div>
@@ -80,7 +80,7 @@
         <button
           v-if="!isAuthenticated"
           @click="login"
-          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          class="bg-[#5c8374] hover:bg-[#092635] text-white font-bold py-2 px-4 rounded"
         >
           Sign In
         </button>
