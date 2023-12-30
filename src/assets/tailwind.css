@@ -5,16 +5,14 @@
 
 /* Define default light theme colors */
 :root {
-  --background-color: #5c8374; /* Light theme background */
+  --background-color: #ffffff; /* Light theme background */
   --text-color: #092635; /* Light theme text */
-  --nav-bg-color: #c4382c;
 }
 
 /* Define dark theme colors */
 [data-theme="dark"] {
   --background-color: #092635; /* Dark theme background */
   --text-color: #5c8374; /* Dark theme text */
-  --nav-bg-color: #1e333f;
 }
 
 body {

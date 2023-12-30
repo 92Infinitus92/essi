@@ -1,12 +1,12 @@
 <template>
   <div>
-    <nav class="bg-gray-800 text-white p-4 flex justify-between items-center">
+    <nav class="bg-black text-white p-4 flex justify-between items-center">
       <!-- Logo -->
       <div class="flex flex-col">
         <img
           src="https://i.ibb.co/M1knWxw/ESSI.webp"
           alt="ESSI Logo"
-          class="h-24"
+          class="w-full h-24 object-contain"
         />
         <h1 class="essi-logo text-xl font-semibold text-center -mt-5">ESSI</h1>
       </div>
@@ -18,22 +18,22 @@
       >
         <router-link
           to="/"
-          class="block px-2 py-2 hover:text-gray-300 text-center text-2xl"
+          class="block px-2 py-2 hover:text-gray-300 text-center text-2xl essi-logo"
           >Home</router-link
         >
         <router-link
           to="/apod"
-          class="block px-2 py-2 hover:text-gray-300 text-center text-2xl"
+          class="block px-2 py-2 hover:text-gray-300 text-center text-2xl essi-logo"
           >APOD</router-link
         >
         <router-link
           to="/earth-image"
-          class="block px-2 py-2 hover:text-gray-300 text-center text-2xl"
+          class="block px-2 py-2 hover:text-gray-300 text-center text-2xl essi-logo"
           >Earth Image</router-link
         >
         <router-link
           to="/epic-image"
-          class="block px-2 py-2 hover:text-gray-300 text-center text-2xl"
+          class="block px-2 py-2 hover:text-gray-300 text-center text-2xl essi-logo"
           >EPIC Image</router-link
         >
       </div>
@@ -80,14 +80,14 @@
         <button
           v-if="!isAuthenticated"
           @click="login"
-          class="bg-[#5c8374] hover:bg-[#092635] text-white font-bold py-2 px-4 rounded"
+          class="bg-[#5c8374] hover:bg-[#347a78] text-white font-bold py-2 px-4 rounded essi-logo"
         >
           Sign In
         </button>
         <button
           v-else
           @click="logout"
-          class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+          class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded essi-logo"
         >
           Sign Out
         </button>
