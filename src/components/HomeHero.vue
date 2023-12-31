@@ -1,27 +1,26 @@
 <template>
-  <div class="relative">
-    <!-- Background Image with Overlay -->
-    <div class="absolute inset-0">
-      <img
-        src="https://i.ibb.co/LPP3mf7/background-ver2.webp"
-        alt="Earth from space"
-        class="w-full h-full object-contain opacity-75"
-      />
-      <div class="absolute inset-0 bg-black opacity-50"></div>
-    </div>
+  <div
+    class="relative min-h-screen flex flex-col justify-center items-center bg-gray-900 text-white font-orbitron"
+  >
+    <img
+      src="https://i.ibb.co/LpXmxdg/background-ver5.webp"
+      alt="Earth from space"
+      class="absolute inset-0 w-full h-full object-cover object-bottom opacity-75"
+    />
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
 
     <!-- Hero Content -->
-    <div class="relative container mx-auto px-6 py-32 lg:py-40 text-center">
-      <h1 class="text-4xl lg:text-6xl font-bold mb-4 text-var(--text-color)">
+    <div class="z-10 p-6 max-w-lg mx-auto space-y-6 text-center essi_logo">
+      <h1 class="text-4xl lg:text-6xl font-bold mb-4 tracking-tight">
         Earth and Space Satellite Images
       </h1>
-      <p class="text-xl lg:text-2xl mb-8 text-var(--text-color)">
+      <p class="text-xl lg:text-2xl">
         Explore the vastness of space and the intricacies of our planet with
         high-resolution imagery.
       </p>
       <router-link
         to="/explore"
-        class="inline-block bg-blue-500 hover:bg-blue-700 font-bold py-2 px-6 rounded-full text-lg transition duration-300 transform hover:scale-105 shadow-lg text-var(--text-color)"
+        class="inline-block bg-[#5c8374] hover:bg-[#347a78] text-white essi-logo py-2 px-6 rounded-full text-lg font-semibold transition transform hover:scale-110 shadow-lg"
       >
         Start Your Journey
       </router-link>
@@ -32,6 +31,5 @@
 <script lang="ts">
 export default {
   name: "HomeHeroSection",
-  // Your script here if necessary
 };
 </script>

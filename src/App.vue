@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="pb-2">
     <nav class="bg-black text-white p-4 flex justify-between items-center">
       <!-- Logo -->
       <div class="flex flex-col">
@@ -63,16 +63,46 @@
           </label>
         </div>
 
-        <!-- User Profile Display -->
-        <div v-if="isAuthenticated" class="flex items-center space-x-4">
-          <img
-            :src="user?.picture"
-            alt="Profile picture"
-            class="rounded-full w-12 h-12"
-          />
-          <div class="text-white text-sm">
-            <p class="font-bold">{{ user?.name }}</p>
-            <p>{{ user?.email }}</p>
+        <!-- User Profile and Dropdown Menu -->
+        <div v-if="isAuthenticated" class="relative">
+          <button
+            @click="toggleDropdown"
+            class="flex items-center focus:outline-none"
+          >
+            <img
+              :src="user?.picture"
+              alt="Profile picture"
+              class="rounded-full w-12 h-12"
+            />
+          </button>
+          <div
+            v-if="showDropdown"
+            class="absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-xl z-20"
+          >
+            <router-link
+              to="/favorites"
+              class="block px-4 py-2 text-sm capitalize text-gray-700 hover:bg-blue-500 hover:text-white"
+            >
+              Favorites
+            </router-link>
+            <router-link
+              to="/collections"
+              class="block px-4 py-2 text-sm capitalize text-gray-700 hover:bg-blue-500 hover:text-white"
+            >
+              Collections
+            </router-link>
+            <router-link
+              to="/saved"
+              class="block px-4 py-2 text-sm capitalize text-gray-700 hover:bg-blue-500 hover:text-white"
+            >
+              Saved
+            </router-link>
+            <button
+              @click="logout"
+              class="w-full text-left block px-4 py-2 text-sm capitalize text-gray-700 hover:bg-blue-500 hover:text-white"
+            >
+              Logout
+            </button>
           </div>
         </div>
 
@@ -80,14 +110,14 @@
         <button
           v-if="!isAuthenticated"
           @click="login"
-          class="bg-[#5c8374] hover:bg-[#347a78] text-white font-bold py-2 px-4 rounded essi-logo"
+          class="inline-block bg-[#5c8374] hover:bg-[#347a78] text-white essi-logo py-2 px-6 rounded-full text-lg font-semibold transition transform hover:scale-110 shadow-lg"
         >
           Sign In
         </button>
         <button
           v-else
           @click="logout"
-          class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded essi-logo"
+          class="inline-block bg-[#5c8374] hover:bg-[#347a78] text-white essi-logo py-2 px-6 rounded-full text-lg font-semibold transition transform hover:scale-110 shadow-lg"
         >
           Sign Out
         </button>
@@ -105,7 +135,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, onMounted } from "vue";
+import { defineComponent, ref, onMounted, onUnmounted } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
 
 export default defineComponent({
@@ -113,38 +143,52 @@ export default defineComponent({
   setup() {
     const { loginWithRedirect, logout, user, isAuthenticated } = useAuth0();
     const isDarkTheme = ref(false);
+    const showDropdown = ref(false);
+    const isMobileMenuOpen = ref(false);
 
-    // Apply theme changes
     const applyTheme = () => {
       const theme = isDarkTheme.value ? "dark" : "light";
       document.documentElement.setAttribute("data-theme", theme);
       localStorage.setItem("theme", theme);
     };
 
-    // Method to toggle the theme
     const toggleDarkTheme = () => {
       isDarkTheme.value = !isDarkTheme.value;
+      applyTheme();
     };
 
-    // Watch for changes on isDarkTheme and apply the theme
-    watch(isDarkTheme, (newValue) => {
+    onMounted(() => {
+      const storedTheme = localStorage.getItem("theme");
+      if (storedTheme) {
+        isDarkTheme.value = storedTheme === "dark";
+      } else {
+        isDarkTheme.value = window.matchMedia(
+          "(prefers-color-scheme: dark)"
+        ).matches;
+      }
       applyTheme();
+      document.addEventListener("click", onClickOutside);
     });
 
-    // Method to toggle the mobile menu
+    onUnmounted(() => {
+      document.removeEventListener("click", onClickOutside);
+    });
+
+    const toggleDropdown = (event: MouseEvent) => {
+      event.stopPropagation(); // Prevent event from immediately propagating to the document
+      showDropdown.value = !showDropdown.value;
+    };
+
+    const onClickOutside = (event: Event) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest(".profile-dropdown")) {
+        showDropdown.value = false;
+      }
+    };
+
     const toggleMobileMenu = () => {
       isMobileMenuOpen.value = !isMobileMenuOpen.value;
     };
-
-    // Initialize the theme based on user preference or system settings
-    onMounted(() => {
-      isDarkTheme.value =
-        localStorage.getItem("theme") === "dark" ||
-        window.matchMedia("(prefers-color-scheme: dark)").matches;
-      applyTheme(); // Apply the initial theme
-    });
-
-    const isMobileMenuOpen = ref(false);
 
     return {
       isDarkTheme,
@@ -153,12 +197,12 @@ export default defineComponent({
       toggleMobileMenu,
       isAuthenticated,
       user,
-      login: () => {
-        loginWithRedirect();
-      },
+      login: () => loginWithRedirect(),
       logout: () => {
         logout({ logoutParams: { returnTo: window.location.origin } });
       },
+      showDropdown,
+      toggleDropdown,
     };
   },
 });
