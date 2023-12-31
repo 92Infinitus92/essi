@@ -70,8 +70,8 @@ export default defineComponent({
 
     const themeClass = computed(() => {
       return isDarkTheme.value
-        ? "ring-1 ring-white/10 bg-white/5 "
-        : "ring-1 ring-black/10 bg-black/5";
+        ? "ring-1 ring-blue-400/2 bg-blue-400/2 "
+        : "ring-1 ring-green-400/10 bg-green-400/5";
     });
 
     return {
