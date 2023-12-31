@@ -74,6 +74,8 @@
               alt="Profile picture"
               class="rounded-full w-12 h-12"
             />
+            <i class="fas fa-chevron-down ml-2 text-white"></i>
+            <!-- Dropdown icon added -->
           </button>
           <div
             v-if="showDropdown"
@@ -106,20 +108,13 @@
           </div>
         </div>
 
-        <!-- Sign In/Sign Out Button -->
+        <!-- Sign In -->
         <button
           v-if="!isAuthenticated"
           @click="login"
           class="inline-block bg-[#5c8374] hover:bg-[#347a78] text-white essi-logo py-2 px-6 rounded-full text-lg font-semibold transition transform hover:scale-110 shadow-lg"
         >
           Sign In
-        </button>
-        <button
-          v-else
-          @click="logout"
-          class="inline-block bg-[#5c8374] hover:bg-[#347a78] text-white essi-logo py-2 px-6 rounded-full text-lg font-semibold transition transform hover:scale-110 shadow-lg"
-        >
-          Sign Out
         </button>
 
         <!-- Mobile Menu Button -->
