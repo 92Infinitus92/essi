@@ -127,14 +127,19 @@
     <!-- Router View: Components for the current route will be rendered here -->
     <router-view></router-view>
   </div>
+  <FooterComponent />
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, onUnmounted } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
+import FooterComponent from "./components/FooterComponent.vue";
 
 export default defineComponent({
   name: "App",
+  components: {
+    FooterComponent,
+  },
   setup() {
     const { loginWithRedirect, logout, user, isAuthenticated } = useAuth0();
     const isDarkTheme = ref(false);
