@@ -7,6 +7,18 @@
     >
       <h2 class="text-3xl font-semibold">{{ apod.title }}</h2>
       <p class="mt-4 text-lg">{{ apod.explanation }}</p>
+      <button
+        @click="handleSaveToFavorites(apod)"
+        :class="[
+          'mt-4 py-2 px-4 rounded-full text-lg font-semibold transition transform shadow-lg',
+          isSaved
+            ? 'bg-gray-400 hover:bg-gray-500 cursor-not-allowed'
+            : 'bg-[#5c8374] hover:bg-[#347a78]',
+        ]"
+        :disabled="isSaved"
+      >
+        {{ isSaved ? "Saved" : "Save to Favorites" }}
+      </button>
     </div>
     <div class="w-3/4 h-screen flex justify-center items-center">
       <!-- If it's a video -->
@@ -31,7 +43,8 @@
 </template>
 
 <script lang="ts">
-import { ref, onMounted } from "vue";
+import { useAuth0 } from "@auth0/auth0-vue";
+import { ref, onMounted, computed } from "vue";
 
 interface ApodData {
   url: string;
@@ -46,8 +59,32 @@ export default {
     const apod = ref<ApodData | null>(null);
     const cacheKey = "apodData";
 
+    const { isAuthenticated, loginWithRedirect, user } = useAuth0();
+    const favorites = ref<ApodData[]>([]);
+
+    const isSaved = computed(() => {
+      return favorites.value.some(
+        (favorite) => favorite.url === apod.value?.url
+      );
+    });
+
+    const handleSaveToFavorites = (apod: ApodData) => {
+      if (!isAuthenticated.value) {
+        loginWithRedirect();
+      } else if (!isSaved.value) {
+        favorites.value.push(apod);
+        localStorage.setItem("favorites", JSON.stringify(favorites.value));
+      }
+    };
+
     onMounted(async () => {
-      // Check if data is already cached
+      // Initialize favorites from localStorage
+      const savedFavorites = localStorage.getItem("favorites");
+      if (savedFavorites) {
+        favorites.value = JSON.parse(savedFavorites);
+      }
+
+      // Check if APOD data is already cached
       const cachedData = localStorage.getItem(cacheKey);
       if (cachedData) {
         apod.value = JSON.parse(cachedData);
@@ -78,6 +115,10 @@ export default {
 
     return {
       apod,
+      handleSaveToFavorites,
+      isAuthenticated,
+      isSaved,
+      user,
     };
   },
 };

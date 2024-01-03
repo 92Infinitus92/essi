@@ -1,11 +1,15 @@
 <template>
   <div
-    class="max-w-sm rounded overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 ease-in-out"
+    class="max-w-sm rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300 ease-in-out"
   >
-    <img class="w-full" :src="image" alt="Feature Image" />
+    <img
+      class="w-full h-32 sm:h-48 object-cover object-center"
+      :src="image"
+      alt="Feature Image"
+    />
     <div class="px-6 py-4">
       <div class="font-bold text-xl mb-2">{{ title }}</div>
-      <p class="text-gray-700 text-base">
+      <p class="text-base card font-semibold">
         {{ description }}
       </p>
     </div>

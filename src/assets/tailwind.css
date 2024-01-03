@@ -22,6 +22,13 @@ body {
   color: var(--text-color);
 }
 
+.card {
+  color: black;
+  [data-theme="dark"] & {
+    color: white;
+  }
+}
+
 nav {
   background-color: var(--nav-bg-color);
 }

@@ -17,7 +17,7 @@
         title="EPIC Image"
         description="View stunning images of Earth from the EPIC camera."
         to="/epic-image"
-        image="https://i.ibb.co/G36fvHb/epiv.webp"
+        image="https://i.ibb.co/T0pLTQm/epic.webp"
       />
     </div>
   </div>

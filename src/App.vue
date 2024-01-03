@@ -87,18 +87,6 @@
             >
               Favorites
             </router-link>
-            <router-link
-              to="/collections"
-              class="block px-4 py-2 text-sm capitalize text-gray-700 hover:bg-blue-500 hover:text-white"
-            >
-              Collections
-            </router-link>
-            <router-link
-              to="/saved"
-              class="block px-4 py-2 text-sm capitalize text-gray-700 hover:bg-blue-500 hover:text-white"
-            >
-              Saved
-            </router-link>
             <button
               @click="logout"
               class="w-full text-left block px-4 py-2 text-sm capitalize text-gray-700 hover:bg-blue-500 hover:text-white"
