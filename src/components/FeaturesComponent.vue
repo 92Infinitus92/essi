@@ -5,16 +5,19 @@
         title="APOD"
         description="Discover the cosmos with daily images and stories."
         to="/apod"
+        image="https://i.ibb.co/YjVD1Mn/pilars.webp"
       />
       <FeatureCard
         title="Earth Image"
         description="Explore high-resolution images of our home planet."
         to="/earth-image"
+        image="https://i.ibb.co/cT9WHsZ/view.webp"
       />
       <FeatureCard
         title="EPIC Image"
         description="View stunning images of Earth from the EPIC camera."
         to="/epic-image"
+        image="https://i.ibb.co/G36fvHb/epiv.webp"
       />
     </div>
   </div>

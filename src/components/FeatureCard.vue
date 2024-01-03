@@ -2,7 +2,7 @@
   <div
     class="max-w-sm rounded overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 ease-in-out"
   >
-    <!-- <img class="w-full" :src="image" alt="Feature Image" /> -->
+    <img class="w-full" :src="image" alt="Feature Image" />
     <div class="px-6 py-4">
       <div class="font-bold text-xl mb-2">{{ title }}</div>
       <p class="text-gray-700 text-base">
@@ -41,10 +41,10 @@ export default defineComponent({
       type: String as PropType<string>,
       required: true,
     },
-    // image: {
-    //   type: String as PropType<string>,
-    //   required: true,
-    // },
+    image: {
+      type: String as PropType<string>,
+      required: true,
+    },
   },
 });
 </script>
