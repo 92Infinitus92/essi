@@ -13,6 +13,7 @@
     </p>
   </div>
 </template>
+
 <script lang="ts">
 import { ref, onMounted } from "vue";
 
@@ -27,75 +28,82 @@ export default {
     const loading = ref(false);
     const errorMessage = ref("");
 
-    const fetchAvailableDates = async (lat: number, lon: number) => {
-      // Round the coordinates to fewer decimal places
-      const roundedLat = parseFloat(lat.toFixed(1));
-      const roundedLon = parseFloat(lon.toFixed(1));
-
+    const fetchLatestAvailableDate = async (
+      lat: number,
+      lon: number
+    ): Promise<string | null> => {
       try {
-        const response = await fetch(
-          `https://api.nasa.gov/planetary/earth/assets?lon=${roundedLon}&lat=${roundedLat}&api_key=4WuRz5BlS8438yctIwGFegJrYcXxOcExxfX0Seuc`
-        );
-        if (!response.ok)
-          throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
-        return data.results.map((asset: { date: string }) => asset.date);
+        const today = new Date();
+        let year = today.getFullYear() - 3; // Change to 3 years prior
+        let month = String(today.getMonth() + 1).padStart(2, "0");
+        let day = String(today.getDate()).padStart(2, "0");
+        let queryDate = `${year}-${month}-${day}`;
+
+        console.log(`Attempting to fetch data for date: ${queryDate}`);
+
+        const assetsUrl = `https://api.nasa.gov/planetary/earth/assets`;
+
+        const fetchDataForDate = async (date: string) => {
+          const url = `${assetsUrl}?lon=${lon}&lat=${lat}&dim=0.025&date=${date}&api_key=4WuRz5BlS8438yctIwGFegJrYcXxOcExxfX0Seuc`; // Use dynamic date
+          const response = await fetch(url);
+          if (response.ok) {
+            const data = await response.json();
+            return data.date ? data.date.split("T")[0] : null;
+          }
+          return null;
+        };
+
+        let availableDate = await fetchDataForDate(queryDate);
+
+        if (!availableDate) {
+          console.log(
+            "No data for computed date, trying with hardcoded date: 2021-01-31"
+          );
+          availableDate = await fetchDataForDate("2021-01-31");
+        }
+
+        return availableDate;
       } catch (error) {
-        console.error("Network error when fetching available dates: ", error);
-        errorMessage.value = "Error fetching available dates.";
-        return [];
+        console.error("Error fetching date:", error);
+        return null;
       }
     };
 
-    const fetchImageData = async (lat: number, lon: number) => {
+    const fetchImageData = async (lat: number, lon: number, date: string) => {
+      const imageryUrl =
+        `https://api.nasa.gov/planetary/earth/imagery?lon=${lon}&lat=${lat}` +
+        `&dim=0.1&date=2021-01-31&api_key=4WuRz5BlS8438yctIwGFegJrYcXxOcExxfX0Seuc`;
+
       try {
-        const availableDates = await fetchAvailableDates(lat, lon);
-        if (availableDates.length === 0) {
-          errorMessage.value =
-            "No available imagery for this location and date.";
-          return;
+        loading.value = true;
+        const response = await fetch(imageryUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const mostRecentDate = availableDates[0];
-        // Again, construct the URL using string concatenation
-        const imageryUrl =
-          "https://api.nasa.gov/planetary/earth/imagery?lon=" +
-          lon +
-          "&lat=" +
-          lat +
-          "&dim=0.025&date=" +
-          mostRecentDate +
-          "&api_key=4WuRz5BlS8438yctIwGFegJrYcXxOcExxfX0Seuc";
-
-        console.log("fetchImageData URL:", imageryUrl); // Log the URL for debugging
-        const imageResponse = await fetch(imageryUrl);
-        if (!imageResponse.ok)
-          throw new Error("Failed to fetch image: " + imageResponse.status);
-
-        const blob = await imageResponse.blob();
+        const blob = await response.blob();
         earthImage.value = { url: URL.createObjectURL(blob) };
+        loading.value = false;
       } catch (error) {
-        if (error instanceof Error) {
-          console.error("Error fetching image data: ", error.message);
-          errorMessage.value = error.message;
-        } else {
-          console.error("An unknown error occurred");
-          errorMessage.value = "An unknown error occurred.";
-        }
-      } finally {
+        console.error("Error fetching image data: ", error);
+        errorMessage.value = "Unable to fetch image data.";
         loading.value = false;
       }
     };
 
     onMounted(() => {
-      loading.value = true;
-
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           const lat = position.coords.latitude;
           const lon = position.coords.longitude;
 
-          fetchImageData(lat, lon);
+          const latestDate = await fetchLatestAvailableDate(lat, lon);
+          if (latestDate) {
+            await fetchImageData(lat, lon, latestDate);
+          } else {
+            errorMessage.value = "No image available for your location.";
+            loading.value = false;
+          }
         },
         (error) => {
           console.error(error);
