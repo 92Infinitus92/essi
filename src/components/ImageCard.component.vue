@@ -37,6 +37,12 @@ interface EpicImageData {
   imageUrl: string;
 }
 
+interface FavoriteItem {
+  hdurl: string;
+  title: string;
+  explanation: string;
+}
+
 export default defineComponent({
   name: "ImageCard",
   props: {
@@ -47,24 +53,35 @@ export default defineComponent({
   },
   setup(props) {
     const { isAuthenticated, loginWithRedirect } = useAuth0();
-    const favorites = ref<string[]>(
+    const favorites = ref<FavoriteItem[]>(
       JSON.parse(localStorage.getItem("favorites") || "[]")
     );
     const isHovering = ref(false);
 
+    // Adjusted to check based on image URL
     const isFavorite = computed(() =>
-      favorites.value.includes(props.image.identifier)
+      favorites.value.some((fav) => fav.hdurl === props.image.imageUrl)
     );
 
     const toggleFavorite = () => {
       if (!isAuthenticated.value) {
         loginWithRedirect();
       } else {
-        const index = favorites.value.indexOf(props.image.identifier);
-        if (index === -1) {
-          favorites.value.push(props.image.identifier);
+        const existingIndex = favorites.value.findIndex(
+          (fav) => fav.hdurl === props.image.imageUrl
+        );
+        if (existingIndex === -1) {
+          // Add to favorites
+          favorites.value.push({
+            hdurl: props.image.imageUrl,
+            title: props.image.caption,
+            explanation: `This image was taken by NASA's EPIC camera on ${formatDate(
+              props.image.date
+            )}.`,
+          });
         } else {
-          favorites.value.splice(index, 1);
+          // Remove from favorites
+          favorites.value.splice(existingIndex, 1);
         }
         localStorage.setItem("favorites", JSON.stringify(favorites.value));
       }

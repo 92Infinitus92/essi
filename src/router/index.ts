@@ -3,6 +3,7 @@ import HomeView from "../views/HomeView.vue";
 import AstronomyPictureOfTheDay from "../views/AstronomyPictureOfTheDay.vue";
 import EarthImage from "../views/EarthImage.vue";
 import EpicImage from "../views/EpicImage.vue";
+import FavoritesView from "../views/Favorites.vue";
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
     path: "/epic-image",
     name: "EpicImage",
     component: EpicImage,
+  },
+  {
+    path: "/favorites",
+    name: "Favorites",
+    component: FavoritesView,
   },
 ];
 
