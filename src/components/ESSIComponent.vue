@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-7xl mx-auto py-12 sm:py-16 lg:py-24">
+  <div class="max-w-7xl mx-auto w-3/4 py-12 sm:py-8 lg:py-10">
     <div class="text-center">
       <h2 class="text-3xl leading-9 font-extrabold sm:text-4xl sm:leading-10">
         About ESSI

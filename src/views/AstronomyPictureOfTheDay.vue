@@ -8,13 +8,17 @@
       class="mt-8 mb-4 p-2 rounded-lg card-reversed"
     />
 
-    <h1 class="text-4xl font-bold mb-4 mt-8">Astronomy Picture of the Day</h1>
+    <h1 class="md:text-4xl text-2xl font-bold mb-4 mt-8 text-center mx-6">
+      Astronomy Picture of the Day
+    </h1>
     <div
       v-if="apod"
-      class="mt-8 mb-8 p-6 max-w-6xl w-full bg-white/10 backdrop-blur-md shadow-lg rounded-xl text-center"
+      class="mt-8 mb-8 p-6 w-3/4 bg-white/10 backdrop-blur-md shadow-lg rounded-xl text-center"
     >
       <h2 class="text-3xl font-semibold">{{ apod.title }}</h2>
-      <p class="mt-4 text-lg">{{ apod.explanation }}</p>
+      <p class="mt-4 md:text-lg text-sm leading-relaxed">
+        {{ apod.explanation }}
+      </p>
       <button
         @click="handleSaveToFavorites(apod)"
         :class="[
@@ -28,7 +32,7 @@
         {{ isSaved ? "Saved" : "Save to Favorites" }}
       </button>
     </div>
-    <div class="w-3/4 h-screen flex justify-center items-center">
+    <div class="w-3/4 h-screen flex justify-center items-center mb-32">
       <!-- If it's a video -->
       <iframe
         v-if="apod && apod.media_type === 'video'"

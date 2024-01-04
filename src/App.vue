@@ -13,7 +13,7 @@
 
       <!-- Navigation Links -->
       <div
-        class="md:flex md:items-center md:justify-center w-fit md:w-auto bg-gray-800 md:bg-transparent"
+        class="md:flex flex flex-col md:flex-row md:items-center md:justify-center w-fit md:w-auto md:bg-transparent"
         :class="{ block: isMobileMenuOpen, hidden: !isMobileMenuOpen }"
       >
         <router-link

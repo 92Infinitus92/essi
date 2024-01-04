@@ -3,19 +3,19 @@
     <h1 class="text-center text-4xl font-bold mb-8">EPIC Images</h1>
 
     <!-- Date Range Selector -->
-    <div class="flex justify-center mb-8">
+    <div class="flex flex-wrap justify-center mb-8">
       <select
         v-model="startDate"
-        class="form-select mx-2 rounded-full p-4 card-reversed font-semibold"
+        class="form-select mx-2 rounded-full p-4 card-reversed font-semibold my-1"
       >
-        <option value="" disabled class="">Select Start Date</option>
+        <option value="" disabled>Select Start Date</option>
         <option v-for="date in availableDates" :key="date" :value="date">
           {{ date }}
         </option>
       </select>
       <select
         v-model="endDate"
-        class="form-select mx-2 rounded-full p-4 card-reversed font-semibold"
+        class="form-select mx-2 rounded-full p-4 card-reversed font-semibold my-1"
       >
         <option value="" disabled>Select End Date</option>
         <option v-for="date in availableDates" :key="date" :value="date">
@@ -24,7 +24,8 @@
       </select>
       <button
         @click="fetchImages"
-        class="inline-block bg-[#5c8374] hover:bg-[#347a78] text-white essi-logo py-2 px-6 rounded-full text-lg font-semibold transition transform hover:scale-110 shadow-lg"
+        :disabled="!isDateRangeValid"
+        class="bg-[#5c8374] hover:bg-[#347a78] text-white essi-logo py-2 px-6 rounded-full text-lg font-semibold transition transform hover:scale-110 shadow-lg my-1"
       >
         Fetch Images
       </button>
@@ -36,7 +37,10 @@
     </div>
 
     <!-- Images Grid -->
-    <div v-if="!loading" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div
+      v-if="!loading"
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+    >
       <ImageCard
         v-for="image in epicImages"
         :key="image.identifier"
@@ -47,7 +51,7 @@
 </template>
 
 <script lang="ts">
-import { ref, Ref, onMounted } from "vue";
+import { ref, Ref, onMounted, computed } from "vue";
 import ImageCard from "@/components/ImageCard.component.vue";
 
 interface EpicImageData {
@@ -65,6 +69,15 @@ export default {
     const endDate: Ref<string> = ref("");
     const epicImages: Ref<EpicImageData[]> = ref([]);
     const availableDates: Ref<string[]> = ref([]);
+
+    const isDateRangeValid = computed(() => {
+      if (!startDate.value || !endDate.value) {
+        return false;
+      }
+      const start = new Date(startDate.value);
+      const end = new Date(endDate.value);
+      return start <= end;
+    });
 
     const loading = ref(false);
 
@@ -123,36 +136,39 @@ export default {
 
     const fetchImages = async () => {
       if (startDate.value && endDate.value) {
-        loading.value = true;
-        epicImages.value = []; // Clear previous images before fetching new ones
-        const filteredDates = availableDates.value.filter(
-          (date) => date >= startDate.value && date <= endDate.value
-        );
-
-        const imageFetchPromises = filteredDates.map((date) =>
-          fetch(
-            `https://api.nasa.gov/EPIC/api/natural/date/${date}?api_key=YOUR_API_KEY`
-          )
-        );
-
-        try {
-          const imagesResponses = await Promise.all(imageFetchPromises);
-          const imagesData = await Promise.all(
-            imagesResponses.map((res) => res.json())
-          );
-
-          epicImages.value = imagesData.flat().map((imageData) => ({
-            identifier: imageData.identifier,
-            caption: imageData.caption,
-            date: imageData.date,
-            imageUrl: epicImageUrl(imageData), // Ensure this function is defined and works correctly
-          }));
-        } catch (error) {
-          console.error("Error fetching images:", error);
+        const start = new Date(startDate.value);
+        const end = new Date(endDate.value);
+        if (start > end) {
+          alert("The start date must be older than the end date.");
+          return;
         }
-
-        loading.value = false;
+      } else {
+        // Handle case where one or both dates are not selected
+        alert("Please select both start and end dates.");
+        return;
       }
+
+      loading.value = true;
+      epicImages.value = []; // Clear the images before fetching new ones
+
+      // Create Date objects for comparison
+      const start = new Date(startDate.value);
+      const end = new Date(endDate.value);
+
+      const filteredDates = availableDates.value
+        .map((d) => new Date(d))
+        .filter((date) => date >= start && date <= end)
+        .map((d) => d.toISOString().split("T")[0]); // Convert back to string for fetching
+
+      console.log(filteredDates);
+
+      if (filteredDates.length > 0) {
+        await fetchImagesByDates(filteredDates);
+      } else {
+        console.error("No dates found within the selected range.");
+      }
+
+      loading.value = false;
     };
 
     const epicImageUrl = (imageData: {
@@ -198,6 +214,7 @@ export default {
       formatDate,
       availableDates,
       loading,
+      isDateRangeValid,
     };
   },
 };

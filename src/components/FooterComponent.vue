@@ -20,11 +20,18 @@
             <router-link to="/" class="hover:text-white">Home</router-link>
           </li>
           <li class="mb-2">
-            <router-link to="/about" class="hover:text-white"
-              >About</router-link
+            <router-link to="/apod" class="hover:text-white">APOD</router-link>
+          </li>
+          <li class="mb-2">
+            <router-link to="/earth-image" class="hover:text-white"
+              >Earth Image</router-link
             >
           </li>
-          <!-- Add other links here -->
+          <li class="mb-2">
+            <router-link to="/epic-image" class="hover:text-white"
+              >EPIC Image</router-link
+            >
+          </li>
         </ul>
       </div>
 
