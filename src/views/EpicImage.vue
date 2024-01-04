@@ -123,22 +123,35 @@ export default {
 
     const fetchImages = async () => {
       if (startDate.value && endDate.value) {
+        loading.value = true;
+        epicImages.value = []; // Clear previous images before fetching new ones
         const filteredDates = availableDates.value.filter(
           (date) => date >= startDate.value && date <= endDate.value
         );
 
-        const imagesRes = await Promise.all(
-          filteredDates.map((date) =>
-            fetch(
-              `https://api.nasa.gov/EPIC/api/natural/date/${date}?api_key=4WuRz5BlS8438yctIwGFegJrYcXxOcExxfX0Seuc`
-            )
+        const imageFetchPromises = filteredDates.map((date) =>
+          fetch(
+            `https://api.nasa.gov/EPIC/api/natural/date/${date}?api_key=YOUR_API_KEY`
           )
         );
 
-        const imagesData = (await Promise.all(
-          imagesRes.map((res) => res.json())
-        )) as EpicImageData[][];
-        epicImages.value = imagesData.flat();
+        try {
+          const imagesResponses = await Promise.all(imageFetchPromises);
+          const imagesData = await Promise.all(
+            imagesResponses.map((res) => res.json())
+          );
+
+          epicImages.value = imagesData.flat().map((imageData) => ({
+            identifier: imageData.identifier,
+            caption: imageData.caption,
+            date: imageData.date,
+            imageUrl: epicImageUrl(imageData), // Ensure this function is defined and works correctly
+          }));
+        } catch (error) {
+          console.error("Error fetching images:", error);
+        }
+
+        loading.value = false;
       }
     };
 

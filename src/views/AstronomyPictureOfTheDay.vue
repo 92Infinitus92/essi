@@ -1,116 +1,124 @@
 <template>
-  <div class="flex flex-col items-center justify-center min-h-screen p-4">
-    <h1 class="text-4xl font-bold mb-8">Astronomy Picture of the Day</h1>
+  <div class="flex flex-col items-center justify-center min-h-screen">
+    <!-- Date Picker Input -->
+    <input
+      type="date"
+      v-model="selectedDate"
+      @change="fetchApodData"
+      class="mt-8 mb-4 p-2 rounded-lg card-reversed"
+    />
+
+    <h1 class="text-4xl font-bold mb-4 mt-8">Astronomy Picture of the Day</h1>
     <div
-      class="flex flex-col sm:flex-row sm:justify-center sm:items-end w-full mb-4"
+      v-if="apod"
+      class="mt-8 mb-8 p-6 max-w-6xl w-full bg-white/10 backdrop-blur-md shadow-lg rounded-xl text-center"
     >
-      <input
-        type="date"
-        v-model="selectedDate"
-        class="form-input mb-4 sm:mb-0 sm:mr-4"
-      />
-      <button @click="fetchApodData" class="btn-primary">Show Picture</button>
-    </div>
-    <div v-if="loading" class="loader">Loading...</div>
-    <div v-for="data in apods" :key="data.date" class="max-w-3xl w-full mb-8">
-      <div
-        v-if="data"
-        class="bg-white/10 backdrop-blur-md shadow-lg rounded-xl text-center p-6"
+      <h2 class="text-3xl font-semibold">{{ apod.title }}</h2>
+      <p class="mt-4 text-lg">{{ apod.explanation }}</p>
+      <button
+        @click="handleSaveToFavorites(apod)"
+        :class="[
+          'mt-4 py-2 px-4 rounded-full text-lg font-semibold transition transform shadow-lg',
+          isSaved
+            ? 'bg-gray-400 hover:bg-gray-500 cursor-not-allowed'
+            : 'bg-[#5c8374] hover:bg-[#347a78]',
+        ]"
+        :disabled="isSaved"
       >
-        <h2 class="text-3xl font-semibold">{{ data.title }}</h2>
-        <p class="text-lg">{{ data.explanation }}</p>
-        <img
-          v-if="data.media_type === 'image'"
-          :src="data.url"
-          :alt="data.title"
-          class="w-full h-auto mt-4"
-        />
-        <iframe
-          v-else
-          :src="data.url"
-          title="video"
-          class="w-full h-64 mt-4"
-          frameborder="0"
-          allowfullscreen
-        ></iframe>
-        <button
-          @click="handleSaveToFavorites(data)"
-          :class="['btn-favorite', isSaved(data) ? 'saved' : '']"
-        >
-          {{ isSaved(data) ? "Saved" : "Save to Favorites" }}
-        </button>
-      </div>
+        {{ isSaved ? "Saved" : "Save to Favorites" }}
+      </button>
+    </div>
+    <div class="w-3/4 h-screen flex justify-center items-center">
+      <!-- If it's a video -->
+      <iframe
+        v-if="apod && apod.media_type === 'video'"
+        :src="apod.url"
+        :title="apod.title"
+        class="w-full h-full"
+        frameborder="0"
+        allow="autoplay"
+        allowfullscreen
+      ></iframe>
+      <!-- If it's an image -->
+      <img
+        v-else-if="apod && apod.media_type === 'image'"
+        :src="apod.url"
+        :alt="apod.title"
+        class="w-full h-full object-cover"
+      />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { ref, onMounted, computed } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
+import { ref, onMounted, computed } from "vue";
 
 interface ApodData {
-  date: string;
+  url: string;
+  title: string;
   explanation: string;
   media_type: string;
-  title: string;
-  url: string;
 }
 
 export default {
   name: "AstronomyPictureOfTheDay",
   setup() {
-    const { isAuthenticated, loginWithRedirect, user } = useAuth0();
-    const apods = ref<ApodData[]>([]);
-    const selectedDate = ref("");
-    const loading = ref(false);
-    const favorites = ref<ApodData[]>(
-      JSON.parse(localStorage.getItem("favorites") || "[]")
-    );
+    const apod = ref<ApodData | null>(null);
+    const selectedDate = ref(new Date().toISOString().split("T")[0]);
+    const cacheKey = "apodData";
 
-    const isSaved = (apod: ApodData) => {
-      return favorites.value.some((favorite) => favorite.date === apod.date);
+    const { isAuthenticated, loginWithRedirect, user } = useAuth0();
+    const favorites = ref<ApodData[]>([]);
+
+    const isSaved = computed(() => {
+      return favorites.value.some(
+        (favorite) => favorite.url === apod.value?.url
+      );
+    });
+
+    const fetchApodData = async () => {
+      const apiUrl = `https://api.nasa.gov/planetary/apod?api_key=4WuRz5BlS8438yctIwGFegJrYcXxOcExxfX0Seuc&date=${selectedDate.value}`;
+      try {
+        const res = await fetch(apiUrl);
+        if (res.ok) {
+          const data = await res.json();
+          apod.value = data;
+          localStorage.setItem(cacheKey, JSON.stringify(data));
+        } else {
+          console.error("Failed to fetch APOD data: ", res.status);
+        }
+      } catch (error) {
+        console.error("Network error when fetching APOD data: ", error);
+      }
     };
 
     const handleSaveToFavorites = (apod: ApodData) => {
       if (!isAuthenticated.value) {
         loginWithRedirect();
-      } else {
-        if (!isSaved(apod)) {
-          favorites.value.push(apod);
-          localStorage.setItem("favorites", JSON.stringify(favorites.value));
-        }
+      } else if (!isSaved.value) {
+        favorites.value.push(apod);
+        localStorage.setItem("favorites", JSON.stringify(favorites.value));
       }
     };
 
-    const fetchApodData = async () => {
-      loading.value = true;
-      const apiKey = "YOUR_API_KEY"; // Replace with your NASA API key.
-      let url = `https://api.nasa.gov/planetary/apod?api_key=${apiKey}`;
-      if (selectedDate.value) {
-        url += `&date=${selectedDate.value}`;
+    onMounted(() => {
+      const savedFavorites = localStorage.getItem("favorites");
+      if (savedFavorites) {
+        favorites.value = JSON.parse(savedFavorites);
       }
 
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        apods.value = [data]; // Wrap the single object in an array for consistency.
-      } catch (error) {
-        console.error("There was an error fetching the APOD data", error);
-      } finally {
-        loading.value = false;
-      }
-    };
-
-    onMounted(fetchApodData);
+      fetchApodData();
+    });
 
     return {
-      apods,
+      apod,
       selectedDate,
-      loading,
-      isAuthenticated,
       handleSaveToFavorites,
+      isAuthenticated,
       isSaved,
       user,
+      fetchApodData,
     };
   },
 };
