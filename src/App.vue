@@ -1,5 +1,5 @@
 <template>
-  <div class="pb-2">
+  <div class="pb-2 flex flex-col min-h-[75vh]">
     <nav class="bg-black text-white p-4 flex justify-between items-center">
       <!-- Logo -->
       <div class="flex flex-col">

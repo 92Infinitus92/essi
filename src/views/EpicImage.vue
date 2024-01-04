@@ -30,8 +30,13 @@
       </button>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <!-- Use the ImageCard component and pass the image object with imageUrl -->
+    <!-- Loader -->
+    <div v-if="loading" class="flex justify-center items-center h-64">
+      <div class="loader"></div>
+    </div>
+
+    <!-- Images Grid -->
+    <div v-if="!loading" class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <ImageCard
         v-for="image in epicImages"
         :key="image.identifier"
@@ -61,6 +66,8 @@ export default {
     const epicImages: Ref<EpicImageData[]> = ref([]);
     const availableDates: Ref<string[]> = ref([]);
 
+    const loading = ref(false);
+
     onMounted(async () => {
       // Fetch available dates and sort them from newest to oldest
       const res = await fetch(
@@ -79,6 +86,7 @@ export default {
     });
 
     const fetchImagesByDates = async (dates: string[]) => {
+      loading.value = true;
       const imageFetchPromises = dates.map(async (date) => {
         const res = await fetch(
           `https://api.nasa.gov/EPIC/api/natural/date/${date}?api_key=4WuRz5BlS8438yctIwGFegJrYcXxOcExxfX0Seuc`
@@ -99,6 +107,7 @@ export default {
             date: imageData.date,
             image: imageData.image, // Assuming 'image' is the correct field
           });
+          loading.value = false;
           return {
             identifier: imageData.identifier,
             caption: imageData.caption,
@@ -108,6 +117,7 @@ export default {
         });
       } catch (error) {
         console.error("Error fetching images by dates:", error);
+        loading.value = false;
       }
     };
 
@@ -163,6 +173,7 @@ export default {
       epicImageUrl,
       formatDate,
       availableDates,
+      loading,
     };
   },
 };
