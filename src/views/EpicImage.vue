@@ -159,13 +159,24 @@ export default {
       date: string;
       image: string;
     }): string => {
-      const date = new Date(imageData.date);
-      const imageUrl = `https://api.nasa.gov/EPIC/archive/natural/${date.getFullYear()}/${String(
-        date.getMonth() + 1
-      ).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}/png/${
-        imageData.image // Use the 'image' field from the API response
-      }.png?api_key=4WuRz5BlS8438yctIwGFegJrYcXxOcExxfX0Seuc`;
+      // Splitting the date string to separate the date and time
+      const dateTimeParts = imageData.date.split(" ");
+      if (dateTimeParts.length < 2) {
+        console.error("Invalid date-time format:", imageData.date);
+        return ""; // Return an empty string or a placeholder image URL in case of format issues
+      }
 
+      // Extracting year, month, and day from the date part
+      const dateParts = dateTimeParts[0].split("-");
+      if (dateParts.length !== 3) {
+        console.error("Invalid date format:", dateTimeParts[0]);
+        return ""; // Return an empty string or a placeholder image URL in case of format issues
+      }
+
+      const [year, month, day] = dateParts;
+
+      // Constructing the image URL
+      const imageUrl = `https://api.nasa.gov/EPIC/archive/natural/${year}/${month}/${day}/png/${imageData.image}.png?api_key=4WuRz5BlS8438yctIwGFegJrYcXxOcExxfX0Seuc`;
       return imageUrl;
     };
 
