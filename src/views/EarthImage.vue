@@ -2,12 +2,27 @@
   <div class="flex flex-col items-center justify-center min-h-screen">
     <h1 class="text-4xl font-bold mb-4">Earth Image</h1>
     <div v-if="loading" class="loader"></div>
-    <img
-      v-if="earthImage && !loading"
-      :src="earthImage.url"
-      alt="Earth Image"
-      class="max-w-lg rounded-lg shadow-xl"
-    />
+    <div v-if="earthImage && !loading">
+      <img
+        :src="earthImage.url"
+        alt="Earth Image"
+        class="max-w-lg rounded-lg shadow-xl"
+      />
+      <div class="flex justify-center mt-4">
+        <button
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          @click="zoomIn"
+        >
+          Zoom Out
+        </button>
+        <button
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
+          @click="zoomOut"
+        >
+          Zoom In
+        </button>
+      </div>
+    </div>
     <p v-if="!earthImage && !loading" class="text-lg mt-4">
       No image available for your location.
     </p>
@@ -26,7 +41,10 @@ export default {
   setup() {
     const earthImage = ref<EarthImageData | null>(null);
     const loading = ref(false);
+    const dim = ref(0.1);
     const errorMessage = ref("");
+    const lat = ref<number | null>(null); // Latitude
+    const lon = ref<number | null>(null); // Longitude
 
     const fetchLatestAvailableDate = async (
       lat: number,
@@ -69,41 +87,43 @@ export default {
       }
     };
 
-    const fetchImageData = async (lat: number, lon: number, date: string) => {
-      const imageryUrl =
-        `https://api.nasa.gov/planetary/earth/imagery?lon=${lon}&lat=${lat}` +
-        `&dim=0.1&date=2021-01-31&api_key=4WuRz5BlS8438yctIwGFegJrYcXxOcExxfX0Seuc`;
-
-      try {
-        loading.value = true;
-        const response = await fetch(imageryUrl);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+    const fetchImageData = async () => {
+      if (lat.value !== null && lon.value !== null) {
+        const imageryUrl = `https://api.nasa.gov/planetary/earth/imagery?lon=${lon.value}&lat=${lat.value}&dim=${dim.value}&date=2021-01-31&api_key=4WuRz5BlS8438yctIwGFegJrYcXxOcExxfX0Seuc`;
+        try {
+          loading.value = true;
+          const response = await fetch(imageryUrl);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const blob = await response.blob();
+          earthImage.value = { url: URL.createObjectURL(blob) };
+          loading.value = false;
+        } catch (error) {
+          console.error("Error fetching image data: ", error);
+          errorMessage.value = "Unable to fetch image data.";
+          loading.value = false;
         }
-
-        const blob = await response.blob();
-        earthImage.value = { url: URL.createObjectURL(blob) };
-        loading.value = false;
-      } catch (error) {
-        console.error("Error fetching image data: ", error);
-        errorMessage.value = "Unable to fetch image data.";
-        loading.value = false;
       }
+    };
+
+    const zoomIn = () => {
+      dim.value = Math.min(dim.value + 0.1, 0.1); // Increase dim
+      fetchImageData();
+    };
+
+    const zoomOut = () => {
+      dim.value = Math.max(dim.value - 0.1, 0.025); // Decrease dim
+      fetchImageData();
     };
 
     onMounted(() => {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-
-          const latestDate = await fetchLatestAvailableDate(lat, lon);
-          if (latestDate) {
-            await fetchImageData(lat, lon, latestDate);
-          } else {
-            errorMessage.value = "No image available for your location.";
-            loading.value = false;
-          }
+          lat.value = position.coords.latitude;
+          lon.value = position.coords.longitude;
+          // Fetch image data with initial lat, lon, and dim
+          fetchImageData();
         },
         (error) => {
           console.error(error);
@@ -114,7 +134,7 @@ export default {
       );
     });
 
-    return { earthImage, loading, errorMessage };
+    return { earthImage, loading, errorMessage, zoomIn, zoomOut };
   },
 };
 </script>
