@@ -92,21 +92,18 @@ export default {
         if (!res.ok) {
           throw new Error(`Failed to fetch images for date ${date}`);
         }
-        return res.json();
+        const images = await res.json();
+        // Assuming that the images array is not empty, take only the first image of each date
+        return images[0];
       });
 
       try {
-        const imagesDataArrays = await Promise.all(imageFetchPromises);
-        epicImages.value = imagesDataArrays.flat().map((imageData) => ({
+        const imagesData = await Promise.all(imageFetchPromises);
+        epicImages.value = imagesData.map((imageData) => ({
           identifier: imageData.identifier,
           caption: imageData.caption,
           date: imageData.date,
-          image: `https://api.nasa.gov/EPIC/archive/natural/${imageData.date.replace(
-            /-/g,
-            "/"
-          )}/png/${
-            imageData.image
-          }.png?api_key=4WuRz5BlS8438yctIwGFegJrYcXxOcExxfX0Seuc`,
+          image: imageData.image,
         }));
       } catch (error) {
         console.error("Error fetching images by dates:", error);
