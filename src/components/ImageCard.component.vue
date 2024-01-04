@@ -1,11 +1,19 @@
 <template>
-  <div class="rounded overflow-hidden shadow-lg">
+  <div
+    class="rounded overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 relative"
+    @mouseenter="isHovering = true"
+    @mouseleave="isHovering = false"
+  >
     <img :src="image.imageUrl" alt="EPIC Image" class="w-full" />
     <div class="px-6 py-4">
       <div class="font-bold text-xl mb-2">{{ image.caption }}</div>
       <p class="text-gray-700 text-base">{{ formatDate(image.date) }}</p>
     </div>
-    <button @click="toggleFavorite" class="favorite-icon">
+    <button
+      @click="toggleFavorite"
+      class="favorite-icon absolute top-2 right-2"
+      v-show="isHovering"
+    >
       <i :class="['fa-heart', isFavorite ? 'fas' : 'far']"></i>
     </button>
   </div>
@@ -16,10 +24,10 @@ import { defineComponent, PropType, computed, ref } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
 
 interface EpicImageData {
-  imageUrl: string;
+  identifier: string;
   caption: string;
   date: string;
-  identifier: string;
+  imageUrl: string;
 }
 
 export default defineComponent({
@@ -35,6 +43,7 @@ export default defineComponent({
     const favorites = ref<string[]>(
       JSON.parse(localStorage.getItem("favorites") || "[]")
     );
+    const isHovering = ref(false);
 
     const isFavorite = computed(() =>
       favorites.value.includes(props.image.identifier)
@@ -67,6 +76,7 @@ export default defineComponent({
       toggleFavorite,
       isFavorite,
       formatDate,
+      isHovering,
     };
   },
 });

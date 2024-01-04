@@ -30,37 +30,31 @@
       </button>
     </div>
 
-    <!-- Images Grid -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div
+      <!-- Use the ImageCard component and pass the image object with imageUrl -->
+      <ImageCard
         v-for="image in epicImages"
         :key="image.identifier"
-        class="rounded overflow-hidden shadow-lg"
-      >
-        <img :src="epicImageUrl(image)" alt="EPIC Image" class="w-full" />
-        <div class="px-6 py-4">
-          <div class="font-bold text-xl mb-2">{{ image.caption }}</div>
-          <p class="text-gray-700 text-base">
-            {{ formatDate(image.date) }}
-          </p>
-        </div>
-      </div>
+        :image="image"
+      />
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { ref, Ref, onMounted } from "vue";
+import ImageCard from "@/components/ImageCard.component.vue";
 
 interface EpicImageData {
   identifier: string;
   caption: string;
   date: string;
-  image: string;
+  imageUrl: string;
 }
 
 export default {
   name: "EpicImage",
+  components: { ImageCard },
   setup() {
     const startDate: Ref<string> = ref("");
     const endDate: Ref<string> = ref("");
@@ -79,7 +73,7 @@ export default {
             new Date(b).getTime() - new Date(a).getTime()
         );
         // Fetch the latest four images
-        const latestFourDates = availableDates.value.slice(0, 4);
+        const latestFourDates = availableDates.value.slice(0, 6);
         await fetchImagesByDates(latestFourDates);
       }
     });
@@ -93,18 +87,25 @@ export default {
           throw new Error(`Failed to fetch images for date ${date}`);
         }
         const images = await res.json();
-        // Assuming that the images array is not empty, take only the first image of each date
-        return images[0];
+        console.log(images); // Log the response to inspect the structure
+        return images[0]; // Taking the first image for the date
       });
 
       try {
         const imagesData = await Promise.all(imageFetchPromises);
-        epicImages.value = imagesData.map((imageData) => ({
-          identifier: imageData.identifier,
-          caption: imageData.caption,
-          date: imageData.date,
-          image: imageData.image,
-        }));
+        epicImages.value = imagesData.map((imageData) => {
+          // Make sure to extract the correct field from imageData
+          const imageUrl = epicImageUrl({
+            date: imageData.date,
+            image: imageData.image, // Assuming 'image' is the correct field
+          });
+          return {
+            identifier: imageData.identifier,
+            caption: imageData.caption,
+            date: imageData.date,
+            imageUrl: imageUrl, // Now this should have the correct URL
+          };
+        });
       } catch (error) {
         console.error("Error fetching images by dates:", error);
       }
@@ -131,13 +132,18 @@ export default {
       }
     };
 
-    const epicImageUrl = (image: EpicImageData): string => {
-      const date = new Date(image.date);
-      return `https://api.nasa.gov/EPIC/archive/natural/${date.getFullYear()}/${String(
+    const epicImageUrl = (imageData: {
+      date: string;
+      image: string;
+    }): string => {
+      const date = new Date(imageData.date);
+      const imageUrl = `https://api.nasa.gov/EPIC/archive/natural/${date.getFullYear()}/${String(
         date.getMonth() + 1
       ).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}/png/${
-        image.image
+        imageData.image // Use the 'image' field from the API response
       }.png?api_key=4WuRz5BlS8438yctIwGFegJrYcXxOcExxfX0Seuc`;
+
+      return imageUrl;
     };
 
     const formatDate = (dateString: string): string => {
