@@ -1,8 +1,6 @@
 <template>
   <div
-    class="rounded overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 relative"
-    @mouseenter="isHovering = true"
-    @mouseleave="isHovering = false"
+    class="rounded overflow-hidden shadow-lg transition-shadow duration-300 relative bg-white bg-opacity-10 hover:bg-opacity-20 border border-gray-600 hover:border-gray-500"
   >
     <img :src="image.imageUrl" alt="EPIC Image" class="w-full" />
     <div class="px-6 py-4">
@@ -11,10 +9,19 @@
     </div>
     <button
       @click="toggleFavorite"
-      class="favorite-icon absolute top-2 right-2"
-      v-show="isHovering"
+      @mouseenter="isHovering = true"
+      @mouseleave="isHovering = false"
+      class="favorite-icon absolute top-2 right-2 transition transform hover:scale-125"
     >
-      <i :class="['fa-heart', isFavorite ? 'fas' : 'far']"></i>
+      <!-- Change to 'fa-solid' and fill red only when isFavorite or isHovering is true -->
+      <i
+        :class="[
+          'fa-heart',
+          isFavorite || isHovering
+            ? 'fa-solid text-red-500'
+            : 'fa-regular text-gray-400',
+        ]"
+      ></i>
     </button>
   </div>
 </template>
