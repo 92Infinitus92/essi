@@ -29,6 +29,13 @@ body {
   }
 }
 
+.card-reversed {
+  color: black;
+  [data-theme="dark"] & {
+    color: #0c6c92;
+  }
+}
+
 nav {
   background-color: var(--nav-bg-color);
 }

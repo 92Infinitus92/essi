@@ -4,13 +4,19 @@
 
     <!-- Date Range Selector -->
     <div class="flex justify-center mb-8">
-      <select v-model="startDate" class="form-select mx-2">
-        <option value="" disabled>Select Start Date</option>
+      <select
+        v-model="startDate"
+        class="form-select mx-2 rounded-full p-4 card-reversed font-semibold"
+      >
+        <option value="" disabled class="">Select Start Date</option>
         <option v-for="date in availableDates" :key="date" :value="date">
           {{ date }}
         </option>
       </select>
-      <select v-model="endDate" class="form-select mx-2">
+      <select
+        v-model="endDate"
+        class="form-select mx-2 rounded-full p-4 card-reversed font-semibold"
+      >
         <option value="" disabled>Select End Date</option>
         <option v-for="date in availableDates" :key="date" :value="date">
           {{ date }}
@@ -18,7 +24,7 @@
       </select>
       <button
         @click="fetchImages"
-        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        class="inline-block bg-[#5c8374] hover:bg-[#347a78] text-white essi-logo py-2 px-6 rounded-full text-lg font-semibold transition transform hover:scale-110 shadow-lg"
       >
         Fetch Images
       </button>
@@ -62,13 +68,50 @@ export default {
     const availableDates: Ref<string[]> = ref([]);
 
     onMounted(async () => {
+      // Fetch available dates and sort them from newest to oldest
       const res = await fetch(
         `https://api.nasa.gov/EPIC/api/natural/available?api_key=4WuRz5BlS8438yctIwGFegJrYcXxOcExxfX0Seuc`
       );
       if (res.ok) {
-        availableDates.value = await res.json();
+        const dates = await res.json();
+        availableDates.value = dates.sort(
+          (a: string | number | Date, b: string | number | Date) =>
+            new Date(b).getTime() - new Date(a).getTime()
+        );
+        // Fetch the latest four images
+        const latestFourDates = availableDates.value.slice(0, 4);
+        await fetchImagesByDates(latestFourDates);
       }
     });
+
+    const fetchImagesByDates = async (dates: string[]) => {
+      const imageFetchPromises = dates.map(async (date) => {
+        const res = await fetch(
+          `https://api.nasa.gov/EPIC/api/natural/date/${date}?api_key=4WuRz5BlS8438yctIwGFegJrYcXxOcExxfX0Seuc`
+        );
+        if (!res.ok) {
+          throw new Error(`Failed to fetch images for date ${date}`);
+        }
+        return res.json();
+      });
+
+      try {
+        const imagesDataArrays = await Promise.all(imageFetchPromises);
+        epicImages.value = imagesDataArrays.flat().map((imageData) => ({
+          identifier: imageData.identifier,
+          caption: imageData.caption,
+          date: imageData.date,
+          image: `https://api.nasa.gov/EPIC/archive/natural/${imageData.date.replace(
+            /-/g,
+            "/"
+          )}/png/${
+            imageData.image
+          }.png?api_key=4WuRz5BlS8438yctIwGFegJrYcXxOcExxfX0Seuc`,
+        }));
+      } catch (error) {
+        console.error("Error fetching images by dates:", error);
+      }
+    };
 
     const fetchImages = async () => {
       if (startDate.value && endDate.value) {
