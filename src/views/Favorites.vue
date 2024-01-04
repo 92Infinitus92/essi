@@ -5,11 +5,19 @@
       <div
         v-for="(favorite, index) in favorites"
         :key="index"
-        class="max-w-sm rounded overflow-hidden shadow-lg"
+        class="max-w-sm rounded overflow-hidden shadow-lg flex flex-col"
       >
-        <img :src="favorite.hdurl" alt="Favorite Image" class="w-full" />
-        <div class="px-6 py-4">
-          <div class="font-bold text-xl mb-2">{{ favorite.title }}</div>
+        <img
+          :src="favorite.hdurl"
+          alt="Favorite Image"
+          class="w-full h-48 object-cover"
+        />
+        <!-- Text container is now a flex container itself and will grow to take remaining space -->
+        <div class="px-6 py-4 flex-grow flex items-center justify-center">
+          <!-- Title is centered within text container -->
+          <div class="font-bold text-xl text-center">
+            {{ favorite.title }}
+          </div>
         </div>
       </div>
     </div>
