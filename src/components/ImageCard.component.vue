@@ -1,11 +1,39 @@
 <template>
   <div
-    class="rounded overflow-hidden shadow-lg transition-shadow duration-300 relative bg-white bg-opacity-10 hover:bg-opacity-20 border border-gray-600 hover:border-gray-500"
+    class="rounded relative overflow-hidden shadow-lg transition-shadow duration-300 bg-white bg-opacity-10 hover:bg-opacity-20 border border-gray-600 hover:border-gray-500"
   >
     <img :src="image.imageUrl" alt="EPIC Image" class="w-full" />
-    <div class="px-6 py-4">
+    <div class="px-6 py-4 relative">
       <div class="font-bold text-xl mb-2">{{ image.caption }}</div>
-      <p class="text-gray-700 text-base">{{ formatDate(image.date) }}</p>
+      <p class="text-base card">{{ formatDate(image.date) }}</p>
+      <div
+        class="absolute inset-x-0 -top-72 -left-20 -z-10 flex transform-gpu justify-center overflow-hidden blur-3xl"
+        aria-hidden="true"
+      >
+        <div
+          class="aspect-[1318/752] w-[125rem] flex-none bg-gradient-to-r from-[#80caff] to-[#4f46e5] opacity-25"
+          style="
+            clip-path: polygon(
+              73.6% 51.7%,
+              91.7% 11.8%,
+              100% 46.4%,
+              97.4% 82.2%,
+              92.5% 84.9%,
+              75.7% 64%,
+              55.3% 47.5%,
+              46.5% 49.4%,
+              45% 62.9%,
+              50.3% 87.2%,
+              21.3% 64.1%,
+              0.1% 100%,
+              5.4% 51.1%,
+              21.4% 63.9%,
+              58.9% 0.2%,
+              73.6% 51.7%
+            );
+          "
+        />
+      </div>
     </div>
     <button
       @click="toggleFavorite"

@@ -2,11 +2,11 @@
   <div class="flex flex-col items-center justify-center min-h-screen">
     <h1 class="text-4xl font-bold mb-4">Earth Image</h1>
     <div v-if="loading" class="loader"></div>
-    <div v-if="earthImage && !loading">
+    <div v-if="earthImage && !loading" class="">
       <img
         :src="earthImage.url"
         alt="Earth Image"
-        class="max-w-lg rounded-lg shadow-xl"
+        class="lg:w-[40%] w-[80%] mx-auto rounded-lg shadow-xl"
       />
       <div class="flex justify-center mt-4">
         <button

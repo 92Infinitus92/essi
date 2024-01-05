@@ -25,24 +25,29 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, onMounted, ref } from "vue";
+
 interface FavoriteItem {
   hdurl: string;
   title: string;
   explanation: string;
 }
 
-export default {
+export default defineComponent({
   name: "FavoritesView",
-  data() {
+  setup() {
+    const favorites = ref<FavoriteItem[]>([]);
+
+    onMounted(() => {
+      const favoritesData = localStorage.getItem("favorites");
+      if (favoritesData) {
+        favorites.value = JSON.parse(favoritesData);
+      }
+    });
+
     return {
-      favorites: [] as FavoriteItem[],
+      favorites,
     };
   },
-  created() {
-    const favoritesData = localStorage.getItem("favorites");
-    if (favoritesData) {
-      this.favorites = JSON.parse(favoritesData);
-    }
-  },
-};
+});
 </script>

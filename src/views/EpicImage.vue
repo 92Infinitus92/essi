@@ -3,7 +3,7 @@
     <h1 class="text-center text-4xl font-bold mb-8">EPIC Images</h1>
 
     <!-- Date Range Selector -->
-    <div class="flex flex-wrap justify-center mb-8">
+    <div class="flex flex-wrap justify-center mb-8 relative">
       <select
         v-model="startDate"
         class="form-select mx-2 rounded-full p-4 card-reversed font-semibold my-1"
@@ -29,6 +29,12 @@
       >
         Fetch Images
       </button>
+      <p
+        class="text-red-600 -mt-7 block absolute text-center w-2/3"
+        v-if="dateRangeError"
+      >
+        {{ dateRangeError }}
+      </p>
     </div>
 
     <!-- Loader -->
@@ -51,7 +57,7 @@
 </template>
 
 <script lang="ts">
-import { ref, Ref, onMounted, computed } from "vue";
+import { ref, Ref, onMounted, computed, watch } from "vue";
 import ImageCard from "@/components/ImageCard.component.vue";
 
 interface EpicImageData {
@@ -65,10 +71,12 @@ export default {
   name: "EpicImage",
   components: { ImageCard },
   setup() {
-    const startDate: Ref<string> = ref("");
-    const endDate: Ref<string> = ref("");
+    const startDate = ref("");
+    const endDate = ref("");
     const epicImages: Ref<EpicImageData[]> = ref([]);
-    const availableDates: Ref<string[]> = ref([]);
+    const availableDates = ref([]);
+    const dateRangeError = ref("");
+    const loading = ref(false);
 
     const isDateRangeValid = computed(() => {
       if (!startDate.value || !endDate.value) {
@@ -79,7 +87,18 @@ export default {
       return start <= end;
     });
 
-    const loading = ref(false);
+    // Watcher to handle the side effects of date range validation
+    watch([startDate, endDate], ([newStartDate, newEndDate]) => {
+      if (!newStartDate || !newEndDate) {
+        dateRangeError.value = "";
+        return;
+      }
+
+      const start = new Date(newStartDate);
+      const end = new Date(newEndDate);
+      dateRangeError.value =
+        start > end ? "The start date must be older than the end date." : "";
+    });
 
     onMounted(async () => {
       // Fetch available dates and sort them from newest to oldest
@@ -139,12 +158,13 @@ export default {
         const start = new Date(startDate.value);
         const end = new Date(endDate.value);
         if (start > end) {
-          alert("The start date must be older than the end date.");
+          // Display a user-friendly error message or handle the error state
+          console.error("The start date must be older than the end date.");
           return;
         }
       } else {
         // Handle case where one or both dates are not selected
-        alert("Please select both start and end dates.");
+        console.error("Please select both start and end dates.");
         return;
       }
 
@@ -215,6 +235,7 @@ export default {
       availableDates,
       loading,
       isDateRangeValid,
+      dateRangeError,
     };
   },
 };

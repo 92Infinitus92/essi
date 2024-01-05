@@ -68,28 +68,47 @@
           <button
             @click="toggleDropdown"
             class="flex items-center focus:outline-none"
+            :class="{
+              'text-gray-300': isDarkTheme,
+              'text-gray-700': !isDarkTheme,
+            }"
           >
             <img
               :src="user?.picture"
               alt="Profile picture"
               class="rounded-full w-12 h-12"
             />
-            <i class="fas fa-chevron-down ml-2 text-white"></i>
+            <i
+              class="fas fa-chevron-down ml-2"
+              :class="{
+                'text-white': isDarkTheme,
+                'text-gray-600': !isDarkTheme,
+              }"
+            ></i>
             <!-- Dropdown icon added -->
           </button>
           <div
             v-if="showDropdown"
-            class="absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-xl z-20"
+            class="absolute right-0 mt-2 py-2 w-48 rounded-md shadow-xl z-20"
+            :class="{ 'bg-[#092635]': isDarkTheme, 'bg-white': !isDarkTheme }"
           >
             <router-link
               to="/favorites"
-              class="block px-4 py-2 text-sm capitalize text-gray-700 hover:bg-blue-500 hover:text-white"
+              class="block px-4 py-2 text-sm capitalize transition-colors duration-200"
+              :class="{
+                'hover:bg-[#123812] text-black hover:text-white': !isDarkTheme,
+                'hover:bg-[#347a78] hover:text-gray-300': isDarkTheme,
+              }"
             >
               Favorites
             </router-link>
             <button
               @click="logout"
-              class="w-full text-left block px-4 py-2 text-sm capitalize text-gray-700 hover:bg-blue-500 hover:text-white"
+              class="w-full text-left block px-4 py-2 text-sm capitalize transition-colors duration-200"
+              :class="{
+                'hover:bg-[#123812] text-black hover:text-white': !isDarkTheme,
+                'hover:bg-[#347a78] hover:text-gray-300': isDarkTheme,
+              }"
             >
               Logout
             </button>
@@ -195,3 +214,19 @@ export default defineComponent({
   },
 });
 </script>
+
+<style>
+/* Add dark theme styles here */
+:root {
+  --text-color-dark: #c0caf5; /* or any color you prefer */
+  --text-hover-bg-dark: #2c2e33; /* or any color you prefer */
+  --dropdown-bg-dark: #092635; /* already set in your template */
+}
+
+/* Add light theme styles here */
+:root {
+  --text-color-light: #4b5563; /* or any color you prefer */
+  --text-hover-bg-light: #0559ff; /* or any color you prefer */
+  --dropdown-bg-light: #4e1818; /* already set in your template */
+}
+</style>
